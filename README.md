@@ -198,7 +198,7 @@ platform支持列表:
 #### 2、编辑和删除
 <img src="https://cdn.iseekfree.com/hawk/guides/edit_room.png"  width="800"></img>
 #### 3、运行弹幕间
-<img src="https://cdn.iseekfree.com/hawk/guides/run_room.png"  width="800"></img>
+<img src="https://cdn.iseekfree.com/hawk/guides/run_room.png?_t=20250707"  width="800"></img>
 
 
 ### 四、常见问题
