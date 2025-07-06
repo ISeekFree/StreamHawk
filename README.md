@@ -4,7 +4,7 @@
 
 #### 软件下载：https://iseekfree.com/office/app/hawk/index.html
 
-#### 小白教程：https://space.bilibili.com/3546817335658933
+#### 小白教程：https://space.bilibili.com/3546817335658933 （参见《简单三步教你10分钟内搭建一个互动数字人直播间》）
 
 #### 弹幕集成：参见“弹幕推送”设置部分
 
