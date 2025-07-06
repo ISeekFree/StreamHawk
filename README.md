@@ -1,5 +1,7 @@
 # 流鹰(StreamHawk)
-全平台弹幕采集助手！
+** 软件定义：全平台弹幕采集助手！ ** 
+** 软件地址：https://iseekfree.com/office/app/hawk/index.html **
+
 
 ### 一、流鹰简介
 
