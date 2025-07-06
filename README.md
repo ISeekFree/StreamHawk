@@ -2,8 +2,11 @@
 
 #### 软件定义：全平台弹幕采集助手！
 
-#### 软件地址：https://iseekfree.com/office/app/hawk/index.html
+#### 软件下载：https://iseekfree.com/office/app/hawk/index.html
 
+#### 小白教程：https://space.bilibili.com/3546817335658933
+
+#### 弹幕集成：参见“弹幕推送”设置部分
 
 ### 一、流鹰简介
 
