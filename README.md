@@ -4,7 +4,7 @@
 
 #### 软件下载：https://iseekfree.com/office/app/hawk/index.html
 
-#### 小白教程：https://space.bilibili.com/3546817335658933 （参见《10分钟！3步搞定AI互动数字人直播间，开播零门槛！》）
+#### 小白教程：[https://space.bilibili.com/3546817335658933](https://www.bilibili.com/video/BV1Kb31znEKC/?spm_id_from=333.1387.homepage.video_card.click&vd_source=be2dd15e00c3435df9861a8cb59b48aa) （参见《10分钟！3步搞定AI互动数字人直播间，开播零门槛！》）
 
 #### 弹幕集成：参见“弹幕推送”设置部分，通过API与您的系统深度集成！
 #### 注意事项：在开启弹幕采集过程中，切勿开启“VPN”(如果开启了VPN，请关闭VPN并重启“流鹰”软件；
