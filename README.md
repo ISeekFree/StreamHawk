@@ -148,12 +148,12 @@ platform支持列表:
   <tbody>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">抖音</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">格式标准为：https://live.douying.com/${roomId}</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.douying.com/${roomId}</td>
       <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开 https://douyin.com ，进入个人直播页；<br/>2、当你的直播间在直播中，进入直播页即可看到对应直播间地址(?后参数不需要)；</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">快手</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">格式标准为：https://live.kuaishou.com/u/${userId}</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.kuaishou.com/u/${userId}</td>
       <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开 https://kuaishou.com ，进入自己的主页；<br/>2、在浏览器地址中即可看到当前用户userId；<br/>3、在弹幕采集过程中，记得扫码登陆(若有划动验证条需要您手动验证取消)</td>
     </tr>
     <tr>
