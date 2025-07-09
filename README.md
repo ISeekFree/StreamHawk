@@ -159,7 +159,7 @@ platform支持列表:
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">B站</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.bilibili.com/${roomId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/>3、在弹幕采集过程中，需要扫码登陆B站账号(这样才能拿到弹幕用户昵称)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/>3、在弹幕采集过程中，需要扫码登陆B站账号(这样才能拿到用户昵称)</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">TikTok</td>
