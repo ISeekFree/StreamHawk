@@ -129,6 +129,10 @@ platform支持列表:
       <td style="border: 1px solid #ccc; padding: 8px;">like</td>
       <td style="border: 1px solid #ccc; padding: 8px;">点赞消息</td>
     </tr>
+    <tr>
+      <td style="border: 1px solid #ccc; padding: 8px;">streamer</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">主播讲话(在弹幕采集页，需手动开启语音识别)</td>
+    </tr>
   </tbody>
 </table>
 
@@ -149,17 +153,17 @@ platform支持列表:
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">抖音</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.douying.com/${roomId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开 https://douyin.com ，进入个人直播页；<br/>2、当你的直播间在直播中，进入直播页即可看到对应直播间地址(?后参数不需要)；</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://douyin.com ，进入个人直播页；<br/>2、当你的直播间在直播中，进入直播页即可看到对应直播间地址(?后参数不需要)；</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">快手</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.kuaishou.com/u/${userId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开 https://kuaishou.com ，进入自己的主页；<br/>2、在浏览器地址中即可看到当前用户userId；<br/>3、在弹幕采集过程中，记得扫码登陆(若有划动验证条需要您手动验证取消)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://kuaishou.com ，进入自己的主页；<br/>2、在浏览器地址中即可看到当前用户userId，拼接直播地址即可；<br/>3、在弹幕采集过程中，记得扫码登陆(若有划动验证条需要您手动验证)</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">B站</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.bilibili.com/${roomId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/>3、在弹幕采集过程中，需要扫码登陆B站账号(这样才能拿到用户昵称)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/>3、在弹幕采集过程中，需要扫码登陆B站账号(这样才能拿到弹幕用户昵称)</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">TikTok</td>
@@ -198,11 +202,61 @@ platform支持列表:
 <img src="https://cdn.iseekfree.com/hawk/guides/add_room.png"  width="800"></img>
 #### 2、编辑和删除
 <img src="https://cdn.iseekfree.com/hawk/guides/edit_room.png"  width="800"></img>
+
 #### 3、运行弹幕间
-<img src="https://cdn.iseekfree.com/hawk/guides/run_room.png?_t=20250707"  width="800"></img>
+特别注意：在开启弹幕采集过程中，切勿开启“VPN”(如果开启了VPN，请关闭VPN并重启“流鹰”软件；
+<img src="https://cdn.iseekfree.com/hawk/guides/run_room.png"  width="800"></img>
+
+### 四、互动插件
+**1、自定义插件**
+自定义插件功能能用来做什么呢？
+1.1、基于弹幕数据进行游戏控制，比如大家可以基于弹幕和主播讲话数据，驱动游戏人物走动、打怪；
+1.2、基于弹幕数据控制机器人行走；
+1.3、基于弹幕数据、主播讲话做电商直播带货能力的分析，做一个专业的主播带货分析能力的Agent；
+1.4、基于弹幕数据，通过控制电机信号做互动射击；
+1.5、基于弹幕数据和主播讲话，进入抽奖大转盘，进行现场抽奖；
+1.6、......
+<img src="https://cdn.iseekfree.com/hawk/guides/add_plugin.jpg"  width="800"></img>
+
+**2、插件集成**
+2.1、插件市场或自定义插件最终以网页嵌入在直播间弹幕采集页面中。
+2.2、然后插件页面中需实现以下代码用于从父窗口中接收实时的弹幕、主播讲话内容等数据：
+```HTML
+window.addEventListener('message', (event) => {
+    //检查来源以确保安全
+    //if(event.origin !== 'xxx'){
+    //  return;
+    //}
+    
+    if(event.data.type === 'StreamInit'){
+      //插件页面初始化
+      var roomId = event.data.data.roomId;
+      console.log('当前房间Id',roomId);
+    }else if(event.data.type === 'StreamHawk'){
+      //弹幕消息、主播讲话消息
+      var data = event.data.data;
+      if(data.type === 'text'){
+        //文本消息
+      }else if(data.type === 'gift'){
+        //礼物消息
+      }else if(data.type === 'entrance'){
+        //进入房间消息
+      }else if(data.type === 'like'){
+        //点赞消息
+      }else if(data.type === 'streamer'){
+        //主播讲话内容
+      }
+    }
+})
+```
+
+**3、启用插件**
+在弹幕采集和主播讲解过程中，大家可根据自己的需求随时切换到任意一款插件。
+<img src="https://cdn.iseekfree.com/hawk/guides/plugin_enable.jpg"  width="800"></img>
 
 
-### 四、常见问题
+
+### 五、常见问题
 
 #### 1、审核事项
 「审核时间」：由于数据源隐私和所属权验证，在创建弹幕直播间后会进入审核。通常审核时间2个工作日，节假日顺延。当然通常审核时间会很快！
@@ -215,8 +269,12 @@ platform支持列表:
 #### 3、退款问题
 「能否退款」：除非本软件问题导致不可用，可按剩余日期/付款时长比例同比退款！其它原因会按照服务协议规定处理！
 
+#### 4、无法采集
+  特别注意：在开启弹幕采集过程中，切勿开启“VPN”(如果开启了VPN，请关闭VPN并重启“流鹰”软件；
 
-### 五、联系我们
+
+### 六、联系我们
 如果你有更多问题想要解答，请通过以下二维码联系我们：
 
 <img src="https://cdn.iseekfree.com/share/contact/wechat_qrcode_geekbruce.jpg" width="500"></img>
+
