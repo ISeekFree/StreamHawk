@@ -42,7 +42,8 @@ curl https://${your_servername}/${your_api_path} \
     "messages": [
       {
         "type":"text",
-        "user":"饭饭",
+        "userName":"饭饭",
+        "userId":"xxx",
         "content":"This streamer is awesome!"
       }
     ]
