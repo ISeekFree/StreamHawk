@@ -168,8 +168,8 @@ platform支持列表:
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">TikTok</td>
-      <td style="border: 1px solid #ccc; padding: 8px;"></td>
-      <td style="border: 1px solid #ccc; padding: 8px;"></td>
+      <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://www.tiktok.com/@${profileId}/live</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在浏览器中打开https://tiktok.com；<br/>2、登陆TikTok(务必！！！）；<br/>3、进入自己的直播间，获取直播地址；</td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">视频号</td>
