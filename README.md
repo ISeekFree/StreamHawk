@@ -277,5 +277,5 @@ window.addEventListener('message', (event) => {
 ### 六、联系我们
 如果你有更多问题想要解答，请通过以下二维码联系我们：
 
-<img src="https://cdn.iseekfree.com/share/contact/wechat_qrcode_geekbruce.jpg" width="500"></img>
+<img src="https://cdn.iseekfree.com/share/contact/wechat_qrcode_geekbruce.jpg" width="400"></img>
 
