@@ -2,7 +2,7 @@
 
 #### 软件定义：全平台弹幕采集助手！
 
-#### 软件下载：https://iseekfree.com/office/app/hawk/index.html
+#### 软件下载：[https://iseekfree.com/)](https://iseekfree.com/)
 
 #### 小白教程：[https://space.bilibili.com/3546817335658933](https://www.bilibili.com/video/BV1Kb31znEKC/?spm_id_from=333.1387.homepage.video_card.click&vd_source=be2dd15e00c3435df9861a8cb59b48aa) （参见《10分钟！3步搞定AI互动数字人直播间，开播零门槛！》）
 
