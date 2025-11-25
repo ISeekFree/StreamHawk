@@ -154,22 +154,22 @@ platform支持列表:
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">抖音</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.douying.com/${roomId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://douyin.com ，进入个人直播页；<br/>2、当你的直播间在直播中，进入直播页即可看到对应直播间地址(?后参数不需要)；</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://douyin.com ，进入个人直播页；<br/>2、进入直播页即可看到对应直播间地址(?后参数不需要)；<br/><span style="color:red;">3、弹幕采集过程中，记得登陆任意抖音账号(若有划动验证条需要您手动验证)</span></td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">快手</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.kuaishou.com/u/${userId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://kuaishou.com ，进入自己的主页；<br/>2、在浏览器地址中即可看到当前用户userId，拼接直播地址即可；<br/>3、在弹幕采集过程中，记得扫码登陆(若有划动验证条需要您手动验证)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://kuaishou.com ，进入自己的主页；<br/>2、在浏览器地址中即可看到当前用户userId，拼接直播地址即可；<br/><span style="color:red;">3、弹幕采集过程中，记得登陆任意快手账号(若有划动验证条需要您手动验证)</span></td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">B站</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://live.bilibili.com/${roomId}</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/>3、在弹幕采集过程中，需要扫码登陆B站账号(这样才能拿到弹幕用户昵称)</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在PC中打开https://bilibili.com ；<br/>2、进入自己的直播间，获取直播地址(?后参数不需要)；<br/><span style="color:red;">3、弹幕采集过程中，务必登陆任意B站账号(若有划动验证条需要您手动验证,这样才能拿到弹幕用户昵称)；</span></td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">TikTok</td>
       <td style="border: 1px solid #ccc; padding: 8px;">地址格式：https://www.tiktok.com/@${profileId}/live</td>
-      <td style="border: 1px solid #ccc; padding: 8px;">1、在浏览器中打开https://tiktok.com；<br/>2、登陆TikTok(务必！！！）；<br/>3、进入自己的直播间，获取直播地址；</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、在浏览器中打开https://tiktok.com；<br/>2、进入自己的直播间，获取直播地址；<br/><span style="color:red;">3、弹幕采集过程中，务必登陆任意TikTok账号(若有划动验证条需要您手动验证)；</span></td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">视频号</td>
