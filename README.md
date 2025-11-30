@@ -173,8 +173,8 @@ platform支持列表:
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">视频号</td>
-      <td style="border: 1px solid #ccc; padding: 8px;"></td>
-      <td style="border: 1px solid #ccc; padding: 8px;"></td>
+      <td style="border: 1px solid #ccc; padding: 8px;">地址格式：使用官方默认</td>
+      <td style="border: 1px solid #ccc; padding: 8px;">1、视频号直播间无需用户单独创建，使用软件默认添加的直播间即可；<br/><span style="color:red;">2、扫码登陆后点击'进入直播间'即可；</span><br/>3、特别注意：目前视频号只采集文本、Emoji弹幕、进入房间消息；            <br/></td>
     </tr>
     <tr>
       <td style="border: 1px solid #ccc; padding: 8px;">小红书</td>
