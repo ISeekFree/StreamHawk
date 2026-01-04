@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流鹰-弹幕聚合</title>
+    <script src="https://cdn.iseekfree.com/share/assets/js/reconnecting-websocket.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0c10;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            
+            /* 平台颜色 */
+            --color-taobao: #ff5000;
+            --color-douyin: #fe2c55;
+            --color-tiktok: #00f2ea;
+            --color-wechat: #07c160;
+            --color-kuaishou: #ff4e00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden; /* 防止页面整体滚动 */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部导航 */
+        header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(0, 255, 127, 0.1);
+            color: #00ff7f;
+            border: 1px solid rgba(0, 255, 127, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff7f;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        /* 弹幕主容器 */
+        #danmaku-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+        }
+
+        /* 隐藏滚动条 */
+        #danmaku-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        #danmaku-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        /* 弹幕卡片样式 */
+        .msg-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            backdrop-filter: blur(5px);
+            animation: slideIn 0.3s ease-out forwards;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .msg-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        /* 平台标识 */
+        .platform-badge {
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* 内容区 */
+        .msg-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .message-text {
+            color: var(--text-main);
+            line-height: 1.5;
+            font-size: 15px;
+            word-break: break-all;
+        }
+
+        /* 动态平台颜色注入 */
+        .msg-taobao { border-left-color: var(--color-taobao); }
+        .msg-taobao .platform-badge { background: var(--color-taobao); color: white; }
+
+        .msg-bilibili { border-left-color: var(--color-taobao); }
+        .msg-bilibili .platform-badge { background: var(--color-taobao); color: white; }
+
+        .msg-douyin { border-left-color: var(--color-douyin); }
+        .msg-douyin .platform-badge { background: var(--color-douyin); color: white; }
+
+        .msg-tiktok { border-left-color: var(--color-tiktok); }
+        .msg-tiktok .platform-badge { background: var(--color-tiktok); color: #000; }
+
+        .msg-wechat { border-left-color: var(--color-wechat); }
+        .msg-wechat .platform-badge { background: var(--color-wechat); color: white; }
+
+        .msg-kuaishou { border-left-color: var(--color-kuaishou); }
+        .msg-kuaishou .platform-badge { background: var(--color-kuaishou); color: white; }
+
+        /* 动画 */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* 底部统计（PC端显示） */
+        footer {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .msg-card {
+                max-width: 100%;
+            }
+            header h1 {
+                font-size: 1rem;
+            }
+            footer {
+                display: none; /* 移动端隐藏底部统计以增加空间 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>流鹰</h1>
+        </div>
+        <div class="status-tag">
+            <div class="status-dot"></div>
+            <span>推送中</span>
+        </div>
+    </header>
+
+    <main id="danmaku-container">
+        <!-- 弹幕将通过 JS 动态插入 -->
+    </main>
+
+    <script>
+        // Get URL parameter
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        const platforms = [
+            { id: 'taobao', name: '淘宝', class: 'msg-taobao' },
+            { id: 'douyin', name: '抖音', class: 'msg-douyin' },
+            { id: 'tiktok', name: 'TikTok', class: 'msg-tiktok' },
+            { id: 'bilibili', name: 'BiliBili', class: 'msg-bilibili' },
+            { id: 'wemedia', name: '视频号', class: 'msg-wechat' },
+            { id: 'kuaishou', name: '快手', class: 'msg-kuaishou' }
+        ];
+        const visitToken = getUrlParameter("visitToken");
+        const container = document.getElementById('danmaku-container');
+        let ws = null;
+        
+
+        function findPlatformName(platform) {
+            var index = platforms.findIndex(p => p.id === platform);
+            return index >= 0 ? platforms[index].name : platform;
+        }
+
+        function findPlatformClass(platform) {
+            var index = platforms.findIndex(p => p.id === platform);
+            return index >= 0 ? platforms[index].class : 'msg-taobao';
+        }
+
+        // 创建弹幕函数
+        function addMessage(message) {
+            // const platform = platforms[Math.floor(Math.random() * platforms.length)];
+            // const user = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+            // const text = mockMessages[Math.floor(Math.random() * mockMessages.length)];
+            const platformName = findPlatformName(message.platform);
+            const platformClass = findPlatformClass(message.platform);
+            
+            const card = document.createElement('div');
+            card.className = `msg-card ${platformClass}`;
+            
+            card.innerHTML = `
+                <span class="platform-badge">${platformName}</span>
+                <div class="msg-content">
+                    <div class="user-info">
+                        <span class="user-name">@${message.userName}</span>
+                    </div>
+                    <div class="message-text">${message.content}</div>
+                </div>
+            `;
+
+            container.appendChild(card);
+
+            // 自动滚动到底部
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+
+            // 保持页面性能，删除多余节点（超过100条时）
+            if (container.children.length > 1000) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        // 获取WSS连接地址
+        async function getWssUrl() {
+            try {
+                let baseUrl = 'https://iseekfree.com/hero';
+                const response = await fetch(`${baseUrl}/api/hawk/aggregate/emitlink`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        visitToken: visitToken
+                    })
+                });
+                
+                if(!response.ok){
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                //alert("getWssUrl resp:" + JSON.stringify(result));
+                if (result.code === 0 && result.data) {
+                    console.log('WSS URL retrieved successfully:', result.data);
+                    return result.data;
+                } else {
+                    throw new Error(`Failed to get WSS URL. Server response: ${result.msg || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error getting WSS URL:', error);
+                //alert("getWssUrl error:" + error);
+                return null;
+            }
+        }
+        
+
+        // 初始化WebSocket连接
+        async function startAggregateWebSocket() {
+            console.log("Starting aggregate WebSocket connection...");
+            if(!visitToken){
+                console.error('Missing visitToken for WebSocket connection');
+                return;
+            }
+            
+            // 获取WSS连接地址
+            const wssUrl = await getWssUrl();
+            if (!wssUrl) {
+                console.error('Failed to retrieve WSS URL');
+                return;
+            }
+            
+            // 关闭现有连接（如果存在）
+            if(ws){
+                ws.close();
+            }
+            
+            // 创建WebSocket连接
+            ws = new ReconnectingWebSocket(wssUrl, null, {
+                connectionTimeout: 3000,
+                maxRetries: 50,
+                debug: false
+            });
+            ws.onopen = function () {
+                console.log('WebSocket connection opened');
+                ws.send(JSON.stringify({"cmd":4004}));//加入房间
+            };
+            ws.onmessage = function (event) {
+                //console.log('WebSocket message from server:', event.data);
+                try{
+                    const data = JSON.parse(event.data);
+                    if(data.cmd == 4014){
+                        var message = data.payload;
+                        //var message = {id:item.id,'icon':formatIcon(item.type),'roomId':route.query.roomId,platform: route.query.platform,roomName:route.query.roomName,type:item.type,userId:item.userId,'userName':item.userName,userAvatar:item.userAvatar,userShortId:item.userShortId,userGender:item.userGender,userFollowers:item.userFollowers,userFollowing:item.userFollowing,userPosts:item.userPosts,userCountry:item.userCountry,userProvince:item.userProvince,userCity:item.userCity,userDescription:item.userDescription,'content':item.content,'statusText':'🔄️'};
+                        addMessage(message);
+                    }
+                    
+                }catch (e) {
+                    console.error('WebSocket parsing message error:', e);
+                }
+            };
+            ws.onclose = function () {
+                console.log('WebSocket connection closed');
+            };
+        }
+        //初始化
+        startAggregateWebSocket();
+
+        function heartBeat(){
+            if(ws && ws.readyState === ReconnectingWebSocket.OPEN){
+                ws.send(JSON.stringify({"cmd":8002}));
+            }
+        }
+        setInterval(() => {
+            heartBeat();
+        },30000);
+    </script>
+</body>
+</html>
