@@ -1,1 +1,631 @@
-TODO：聚合显示多平台弹幕，下12.27日前更新
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>流鹰-弹幕聚合控制台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 qrcode.js 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.iseekfree.com/share/assets/js/reconnecting-websocket.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.4;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+        }
+        
+        /* Top toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: bold;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toolbar-title i {
+            font-size: 24px;
+        }
+        
+        /* Main content */
+        .content {
+            flex: 1;
+            padding: 24px 16px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+        }
+        
+        /* Card styling */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            color: #667eea;
+        }
+        
+        /* Connection URL section */
+        .url-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .url-input-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f9f9f9;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .btn {
+            padding: 14px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-copied {
+            background-color: #07c160;
+            color: white;
+        }
+        
+        /* QR Code section */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+            padding: 20px;
+            /* 防止二维码溢出容器 */
+            overflow: hidden; 
+        }
+
+        /* 修复生成的img样式，确保居中 */
+        .qr-code img {
+            display: block;
+        }
+        
+        .qr-placeholder {
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .qr-instruction {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            line-height: 1.5;
+            max-width: 300px;
+        }
+        
+        .qr-instruction strong {
+            color: #333;
+        }
+        
+        /* Status section */
+        .status-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .status-item {
+            flex: 1;
+            min-width: 150px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .status-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .status-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+            color: #888;
+        }
+        
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .toolbar {
+                padding: 14px 16px;
+            }
+            
+            .toolbar-title {
+                font-size: 18px;
+            }
+            
+            .content {
+                padding: 20px 12px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 16px;
+            }
+            
+            .qr-code {
+                width: 180px;
+                height: 180px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card-title {
+                font-size: 16px;
+            }
+            
+            .status-container {
+                flex-direction: column;
+            }
+            
+            .status-item {
+                width: 100%;
+            }
+        }
+        
+        /* Animation for copy button */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <div class="toolbar-title">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>弹幕聚合控制台</span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Connection URL Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-link"></i>
+                    <span>连接地址</span>
+                </div>
+                <div class="url-container">
+                    <div class="url-input-group">
+                        <input type="text" id="connectionUrl" class="url-input" readonly value="">
+                        <button class="btn btn-primary" id="copyBtn">
+                            <i class="fas fa-copy"></i>
+                            <span id="copyText">复制连接地址</span>
+                        </button>
+                    </div>
+                    <p style="font-size: 14px; color: #666; line-height: 1.5;">
+                        将此连接分享给用户，或使用下方二维码，用户即可观看直播弹幕聚合内容。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- QR Code Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-qrcode"></i>
+                    <span>观看二维码</span>
+                </div>
+                <div class="qr-container">
+                    <div class="qr-code" id="qrCode">
+                        <!-- 二维码将在这里生成 -->
+                    </div>
+                    <div class="qr-instruction">
+                        使用手机扫描此二维码<br>
+                        <strong>即可观看直播弹幕聚合内容</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Card -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>弹幕消息</span>
+                </div>
+                <div class="status-container">
+                    <div class="status-item">
+                        <div class="status-value" id="messageCount">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameter
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // DOM elements
+        const connectionUrl = document.getElementById('connectionUrl');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyText = document.getElementById('copyText');
+        const qrCode = document.getElementById('qrCode');
+        const messageCount = document.getElementById('messageCount');
+        
+        // Global variables
+        let ws = null;
+        let visitToken = getUrlParameter("visitToken");;
+        let totalMessages = 0;
+        
+        //Generate dynamic connection URL
+        function  generateConnectionUrl() {
+		    if(visitToken && visitToken.length > 0){
+                return "https://iseekfree.com/app/hawk/plugin/aggr_screen.html?visitToken=" + visitToken;
+            }
+            return '';
+        }
+        
+        // Generate QR code using JS Library
+        function generateQRCode(url) {
+            // 清除之前的二维码内容
+            qrCode.innerHTML = '';
+            
+            // 计算二维码尺寸
+            // 容器宽度 200px, padding 20px -> 内容区域 160px
+            // 手机端容器宽度 180px, padding 20px -> 内容区域 140px
+            const containerWidth = qrCode.clientWidth;
+            const padding = 40; // 20px * 2
+            const qrSize = containerWidth > 0 ? (containerWidth - padding) : 140;
+
+            // 使用 QRCode.js 生成
+            try {
+                new QRCode(qrCode, {
+                    text: url,
+                    width: qrSize,
+                    height: qrSize,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                console.error("二维码生成失败", e);
+                qrCode.innerHTML = '<div class="qr-placeholder">生成失败</div>';
+            }
+        }
+        
+        // Copy URL to clipboard
+        function copyToClipboard() {
+            connectionUrl.select();
+            connectionUrl.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                // 尝试使用现代 API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(connectionUrl.value).then(onCopySuccess, onCopyFail);
+                } else {
+                    // Fallback
+                    document.execCommand('copy');
+                    onCopySuccess();
+                }
+            } catch (err) {
+                onCopyFail(err);
+            }
+        }
+        
+        function onCopySuccess() {
+            // Change button text and style temporarily
+            copyText.innerHTML = '<i class="fas fa-check"></i> 已复制';
+            copyBtn.classList.add('btn-copied');
+            copyBtn.classList.add('pulse');
+            
+            setTimeout(() => {
+                copyText.innerHTML = '<i class="fas fa-copy"></i> 复制连接地址';
+                copyBtn.classList.remove('btn-copied');
+                copyBtn.classList.remove('pulse');
+            }, 2000);
+        }
+
+        function onCopyFail(err) {
+            console.error('Failed to copy: ', err);
+            // 即使失败，为了用户体验也可以暂时显示已尝试
+            alert("复制失败，请手动选择复制");
+        }
+        
+        // 获取WSS连接地址
+        async function getWssUrl() {
+            try {
+                let baseUrl = 'https://iseekfree.com/hero';
+                const response = await fetch(`${baseUrl}/api/hawk/aggregate/emitlink`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        visitToken: visitToken
+                    })
+                });
+                
+                if(!response.ok){
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert("getWssUrl resp:" + JSON.stringify(result));
+                if (result.code === 0 && result.data) {
+                    console.log('WSS URL retrieved successfully:', result.data);
+                    return result.data;
+                } else {
+                    throw new Error(`Failed to get WSS URL. Server response: ${result.msg || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error getting WSS URL:', error);
+                //alert("getWssUrl error:" + error);
+                return null;
+            }
+        }
+        
+        // 初始化WebSocket连接
+        async function startAggregateWebSocket() {
+            console.log("Starting aggregate WebSocket connection...");
+            
+            if(!visitToken){
+                console.error('Missing visitToken for WebSocket connection');
+                return;
+            }
+            
+            // 获取WSS连接地址
+            const wssUrl = await getWssUrl();
+            if (!wssUrl) {
+                console.error('Failed to retrieve WSS URL');
+                return;
+            }
+            
+            // 关闭现有连接（如果存在）
+            if (ws) {
+                ws.close();
+            }
+            
+            // 创建WebSocket连接
+            ws = new ReconnectingWebSocket(wssUrl, null, {
+                connectionTimeout: 3000,
+                maxRetries: 20,
+                debug: false
+            });
+            ws.onopen = function () {
+                console.log('WebSocket connection opened');
+                // 更新状态UI
+                // const statusValue = document.querySelector('.status-value');
+                // if(statusValue){
+                //     statusValue.style.color = '#07c160';
+                // }
+                //alert("onopen");
+                ws.send(JSON.stringify({"cmd":4004}));//加入房间
+            };
+            ws.onmessage = function (event) {
+                console.log('WebSocket message from server:', event.data);
+                try{
+                    //const data = JSON.parse(event.data);
+                }catch (e) {
+                    console.error('WebSocket parsing message error:', e);
+                }
+                //alert("onmessage");
+            };
+            ws.onclose = function () {
+                console.log('WebSocket connection closed');
+                //alert("onclose");
+            };
+        }
+        
+        // Simulate live data updates
+        function incrLiveData() {
+            totalMessages++;
+            messageCount.textContent = ""+totalMessages;
+        }
+
+        
+        // Initialize the page
+        function init() {
+            // Generate dynamic URL
+            connectionUrl.value = generateConnectionUrl();
+            // Wait a moment for layout to stabilize for accurate size calculation
+            setTimeout(() => {
+                generateQRCode(connectionUrl.value);
+            }, 100);
+
+            // Set up event listeners
+            copyBtn.addEventListener('click', copyToClipboard);
+            
+            // Select URL text when clicking on input
+            connectionUrl.addEventListener('click', function() {
+                this.select();
+            });
+            
+            // Listen for messages from parent (if embedded)
+            window.addEventListener('message', (event) => {
+                try {
+                    if(event.data.type === 'StreamInit'){
+                        //初始化并加入房间
+                        console.log('Received StreamInit message');
+                        //弹幕消息、主播讲话消息
+                        visitToken = event.data.data.visitToken;
+
+                        // Generate dynamic URL
+                        connectionUrl.value = generateConnectionUrl();
+                        // Wait a moment for layout to stabilize for accurate size calculation
+                        setTimeout(() => {
+                            generateQRCode(connectionUrl.value);
+                        }, 100);
+                        
+                        // 生成wss连接，并加入房间
+                        startAggregateWebSocket();
+                    }else if (event.data.type === 'StreamHawk') {
+                        var message = event.data.data;
+                        var msgType = message.type;
+                        //var bullet = {id:item.id,'icon':formatIcon(item.type),'roomId':route.query.roomId,platform: route.query.platform,roomName:route.query.roomName,type:item.type,userId:item.userId,'userName':item.userName,userAvatar:item.userAvatar,userShortId:item.userShortId,userGender:item.userGender,userFollowers:item.userFollowers,userFollowing:item.userFollowing,userPosts:item.userPosts,userCountry:item.userCountry,userProvince:item.userProvince,userCity:item.userCity,userDescription:item.userDescription,'content':item.content,'statusText':'🔄️'};
+                        if(msgType == 'text' || msgType == 'gift' || msgType == 'entrance' || msgType == 'like' || msgType == 'streamer'){//合法消息类型
+                            incrLiveData();
+                            if(ws && ws.readyState === ReconnectingWebSocket.OPEN) {
+                                //ws.send(JSON.stringify(message));
+                                console.log('Aggr message sent via WebSocket:',message);
+                            }else{
+                                console.warn('Aggr WebSocket is not connected. Cannot send danmaku message.');
+                            }
+                        }
+                    }
+                }catch(e){
+                    console.error('Error processing message:', e);
+                }
+            });
+            
+            // 监听窗口大小变化以重新调整二维码大小
+            window.addEventListener('resize', () => {
+                // 使用防抖动，避免频繁刷新
+                clearTimeout(window.resizeTimer);
+                window.resizeTimer = setTimeout(() => {
+                    generateQRCode(connectionUrl.value);
+                }, 250);
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
