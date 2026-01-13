@@ -42,9 +42,22 @@ curl https://${your_servername}/${your_api_path} \
     "messages": [
       {
         "type":"text",
+        "platform": "$platform",
+        "content":"This streamer is awesome!",
+        "roomId":"$roomId",
+        "roomName":"$roomName",
+        "userId":"",//匿名直播间不存在
         "userName":"饭饭",
-        "userId":"xxx",
-        "content":"This streamer is awesome!"
+        "userAvatar":"https://xxx.jpg",
+        "toUserId":"",//多主播模式下的礼物消息
+        "toUserName":"",//多主播模式下的礼物消息
+        "gift":{
+          "id": "",//礼物id
+          "name":"$giftName",
+          "icon":"https://xxx.jpg",
+          "price":0,//价格(以平台的货币为单位)
+          "comboCount":1 //连击礼物数量
+        }
       }
     ]
 }'
